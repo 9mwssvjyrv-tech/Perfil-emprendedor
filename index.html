@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Perfil Emprendedor</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body { font-family: Arial; background:#eef2f7; padding:20px; }
+.container { max-width:900px; margin:auto; }
+.card { background:white; padding:20px; border-radius:12px; margin:10px 0; box-shadow:0 3px 8px rgba(0,0,0,0.1);}
+button { padding:12px 25px; border:none; border-radius:8px; background:#3498db; color:white; cursor:pointer; margin-top:15px; }
+input { padding:12px; margin:10px 0; width:100%; }
+.hidden { display:none; }
+.flex { display:flex; gap:15px; flex-wrap:wrap; justify-content:left;}
+.split { display:flex; gap:20px; flex-wrap:wrap;}
+#error1,#error2 { color:red; text-align:left; }
+canvas { max-width:300px; margin:auto; display:block; }
+table { width:100%; }
+td,th { padding:8px; text-align:left; }
+th { background:#2c3e50; color:white; }
+</style>
+</head>
+
+<body>
+
+<h1>🚀 Test Perfil Emprendedor</h1>
+
+<!-- PANTALLA 1 -->
+<div id="pantalla1" class="container card">
+<h2>Ingresa tus datos</h2>
+<input id="nombre" placeholder="Tu nombre">
+<input id="correo" placeholder="Tu correo">
+<div id="error1"></div>
+<button onclick="irPreguntas()">Siguiente</button>
+</div>
+
+<!-- PANTALLA 2 -->
+<div id="pantalla2" class="hidden">
+<div id="formulario" class="container"></div>
+<div style="text-align:center">
+<button onclick="calcularResultado()">Ver resultado</button>
+</div>
+<div id="error2"></div>
+</div>
+
+<!-- PANTALLA 3 -->
+<div id="pantalla3" class="hidden container">
+<div id="zonaPDF">
+<div id="resultado"></div>
+<canvas id="grafica"></canvas>
+</div>
+
+<div style="text-align:center">
+<button onclick="descargarPDF()">Descargar PDF</button>
+</div>
+</div>
+
+<script>
+
+/* ===== PERFILES ===== */
+const perfiles=["Realizador","Comerciante","Mago","Movilizador","Maestro"];
+
+/* ===== DESCRIPCIONES (rellena aquí) ===== */
+const descripciones = {
+
+"Realizador":{
+general:"Los realizadores hacen que las ideas se hagan planes tangibles. Un realizador observa el escenario completo hasta el más pequeño detalle y simplifica los problemas más complejos, su fortaleza es la ejecución. En un forma simple, son excelentes en hacer las cosas sucedan. Los realizadores prefieren los procesos y sistemas sobre las personas y aplican sus habilidades organizacionales en todos los campos.",
+deseo:"Resolver los problemas",
+temor:"Perder el control",
+prioridad:"Ejecución y planificación",
+detalle:{deseo:"",temor:"",prioridad:""},
+fortalezas:["muy disciplinados y organizados","Orientados a resultados","Experto planeador"],
+debilidades:["No les gusta ceder el control","Pueden ser dominadores y agresivos","Poco coeficiente emocional"],
+referente:{nombre:"Henrry Ford - Fundador de Ford Motor Company",descripcion:"Henry Ford es un ejemplo clásico de realizador. Creó el primer automóvil accesible para la clase media americana, revolucionando la industria automotriz y haciendo que los automóviles fueran asequibles para millones de personas."}
+},
+
+"Comerciante":{
+general:"Los comerciantes están buscando siempre por lo más grande y nuevo, identifican rápidamente una oportunidad de mercado, necesidad o vacío e identifican como suplir esa demanda. Muchas veces ajustan o improvisan sobre ideas existentes y aplican conceptos innovadores de otras industrias",
+deseo:"Capitalizar las oportunidades",
+temor:"Perder dinero",
+prioridad:"Ingresos",
+detalle:{deseo:"",temor:"",prioridad:""},
+fortalezas:["Decisivo","Persuasivo","Improvisador"],
+debilidades:["Te enfocas en el corto plazo","Tiendes a tomar atajos","Impaciente"],
+referente:{nombre:"Richard Branson - Fundador de Virgin Group",descripcion:"Richard Branson es un ejemplo de comerciante. Ha creado una empresa global basada en la identificación de oportunidades de mercado y la creación de marcas atractivas."}
+},
+
+"Mago":{
+general:"A menudo cuestionas el status quo, el Mago sueña sobre lo que puede ser realizado. él o ella toma riesgos que no siempre son calculados, navega en territorio inexplorado y permanece al frente del mercado. Los magos son los que crean el futuro, sorprendiendo a los clientes y competidores, Son visionarios y rompen las reglas, siempre están preguntanso '¿por qué no?'",
+deseo:"Inovar",
+temor:"Quedarse sin ideas",
+prioridad:"Ideas",
+detalle:{deseo:"",temor:"",prioridad:""},
+fortalezas:["Piensa de forma imaginativa","Pensamiento innovador","No teme cuestionar la reglas"],
+debilidades:["Poco practico a veces","mucha inversión emocional en sus ideas lo que te hace estar a la defensiva"],
+referente:{nombre:"Steve Jobs - Fundador de Apple",descripcion:"Steve Jobs es un ejemplo de mago. Creó productos revolucionarios que cambiaron la forma en que interactuamos con la tecnología."}
+},
+
+"Movilizador":{
+general:"Movilizadores son el hilo conductor - conectan las ideas, personas y recursos, son excelentes en crear grandes relaciones y equipos con gran energia. Casi siempre se involucran en todos los detalles y a veces se enfocan en problemas sociales y actúan como catalizadores de cambios en el sistema",
+deseo:"Ayudar a otros",
+temor:"Conflicto",
+prioridad:"Gente",
+detalle:{deseo:"",temor:"",prioridad:""},
+fortalezas:["Conecta ideas con personas","Empático y con compasión","Catalizador para cambio social"],
+debilidades:["Puede depender mucho de las personas","Es posible que no tengas experiencia profunda"],
+referente:{nombre:"Muhammad Yunus - Fundador de Grameen Bank",descripcion:"Muhammad Yunus es un ejemplo de movilizador. Creó el modelo de microcrédito que ha ayudado a millones de personas a salir de la pobreza."}
+},
+
+"Maestro":{
+general:"Son especialistas y expertos por derecho propio. Los Maestros son muy capaces y con amplios conocimientos en su área. Ellos tienen estándares de calidad muy altos y esperan lo mismo de los demás. Un experto, es visto generalmete como un modelo a seguir, líder fuerte o gran fuente de inspiración en su industria",
+deseo:"Se un experto",
+temor:"Ser promedio",
+prioridad:"Conocimiento",
+detalle:{deseo:"",temor:"",prioridad:""},
+fortalezas:["Altamente capaces y con mucho conocimiento","Confiables","Tiene altos estándares de excelencia"],
+debilidades:["Podrias llegar a ser inflexible","Puedes llegar a se miope en tus observaciones"],
+referente:{nombre:"Bill Gates - Fundador de Microsoft",descripcion:"Bill Gates es un ejemplo de maestro. Es un experto en tecnología y ha creado una empresa global basada en la innovación y el conocimiento."}
+}
+
+};
+
+const opciones=[
+{texto:"No muy cierto de mí",valor:1},
+{texto:"Algo cierto de mí",valor:2},
+{texto:"Cierto de mí",valor:3},
+{texto:"Muy cierto de mí",valor:4}
+];
+
+/* ===== PREGUNTAS ===== */
+const preguntas = [
+{
+titulo:"Lo primero que haces cuando  comienzas un proyecto es:",
+afirmaciones:[
+"Planificas cada detalle y haces listas",
+"Buscas un proyecto similar como referencia",
+"Haces una lluvia de ideas para pensar en ideas no convencionales",
+"Juntas a la gente indicada",
+"Reúnes rápidamente el conocimiento y los recursos necesarios"
+]
+},
+{
+titulo:"De los siguientes, que crees que es lo más importante para que tu proyecto tenga éxito:",
+afirmaciones:[
+"Seguir el proceso",
+"Detectar la oportunidad adecuada",
+"Tener una idea única",
+"Tener al equipo adecuado",
+"Tener experiencia requerida"
+]
+},
+{
+titulo:"En el contexto de trabajo en equipo, mi mayor fortaleza es:",
+afirmaciones:[
+"Planificación  y ejecución",
+"Detectar oportunidades y adaptar ideas",
+"Pensar alocada e imaginativamente",
+"Relacionarse con las personas",
+"Ser capaz de dominar algo mejor que otros"
+]
+},
+{
+titulo:"Si tuviera que tomar una decisión importante con respecto al proyecto, yo:",
+afirmaciones:[
+"Veo si encaja en el plan de acción",
+"Comparo los costos y beneficios de todas las acciones rápidamente",
+"Sigo a mis instintos y hago lo que se siente bien",
+"Llamo a mi equipo y escucho sus opiniones antes de tomar una decisión",
+"Hago una investigación exhaustiva y reúno datos y toda la información necesaria"
+]
+},
+{
+titulo:"Cual sería tu mayor preocupación mientras el proyecto está en marcha?",
+afirmaciones:[
+"Que las cosas se salgan de control o se vuelva un caos",
+"Que el proyecto no genere dinero",
+"Quedarse sin ideas originales a mitad del proyecto",
+"Los compañeros del equipo no trabajan bien juntos",
+"No tener el conocimiento para terminar el proyecto satisfactoriamente"
+]
+},
+{
+titulo:"Imagina que hay una crisis durante el proyecto . Tu reacción sería:",
+afirmaciones:[
+"Usar un plan b que ya tendría listo",
+"Aprovechar al máximo la situación y adaptarme rápidamente",
+"Pensar en cómo  convertir el desafío en una solución apropiada",
+"Juntar al equipo y pensar todos juntos para pensar una solución apropiada",
+"Afrontar el desafío con la confianza de que puedo superarlo"
+]
+},
+{
+titulo:"Imagina que te piden que evalúes tu proyecto y los proyectos de tus compañeros. Que es un proyecto exitoso según tú:",
+afirmaciones:[
+"El proyecto es ejecutado efectivamente y a tiempo",
+"El proyecto genera ganancias y tiene sentido financieramente hablando",
+"El proyecto tiene la solución más innovadora",
+"Los compañeros de equipo complementan sus fortalezas entre si",
+"El resultado final es de la más alta calidad, con atención a los detalles"
+]
+},
+{
+titulo:"Imagina que estás considerando iniciar un negocio. Tu comenzarías algo propio porque:",
+afirmaciones:[
+"Veo una solución más eficiente al problema",
+"Veo una oportunidad para construir un negocio rentable rápidamente",
+"Tengo una idea que cambiará el mundo",
+"Quiero resolver los problemas de la sociedad con mi emprendimiento",
+"Tengo el conocimiento y la experiencia para ofrecer un producto o servicio"
+]
+},
+{
+titulo:"¿qué tanto se parecen los siguientes emprendedores a tu personalidad?",
+afirmaciones:[
+"Henry ford, el fundador de la compañía de motores ford, que creó el primer automóvil accesible para la clase media americana",
+"Richard branson, el fundador del grupo virgin, que es rápido al identificar oportunidades de negocio y necesidades no satisfechas.  El grupo virgin tiene más de 400 compañías - desde celulares hasta viaje espacial",
+"Steve jobs, fundador de apple y pixar. Steve jobs soñaba con mantenerse por delante del mercado, creía en sorprender y deleitar a los clientes y navegar enteramente en territorios nuevos todo el tiempo",
+"Mohammad yunus fundador de grameen bank, pionero del micro financiamiento social. Gran catalizador que trajo un cambio sistemático y abordó problemas sociales a gran escala al atraer a la gente indicada",
+"Kiran mazumdar shaw, fundadora de biocon. Se estableció como experta en investigación biomédica y construyó un negocio exitoso alrededor de esto"
+]
+},
+{
+titulo:"Está pregunta es acerca de tu perspectiva, en general. Tú crees que:",
+afirmaciones:[
+"La vida es una aventura bien planeada",
+"La vida es aprovechar al máximo cada momento",
+"La vida es vivir mis propios sueños",
+"La vida es acerca de ayudar a otras personas",
+"La vida consiste en descubrir para lo que soy mejor y hacerlo"
+]
+}
+];
+
+/* ===== GENERAR FORM ===== */
+const form=document.getElementById("formulario");
+
+preguntas.forEach((p,i)=>{
+let html=`<div class="card"><h3>${p.titulo}</h3><table><tr><th></th>`;
+opciones.forEach(o=> html+=`<th>${o.texto}</th>`);
+html+=`</tr>`;
+p.afirmaciones.forEach((a,f)=>{
+html+=`<tr><td>${a}</td>`;
+opciones.forEach(o=>{
+html+=`<td><input type="radio" name="p${i}_f${f}" value="${o.valor}"></td>`;
+});
+html+=`</tr>`;
+});
+html+=`</table></div>`;
+form.innerHTML+=html;
+});
+
+/* ===== FLUJO ===== */
+function irPreguntas(){
+let nombre=document.getElementById("nombre").value;
+let correo=document.getElementById("correo").value;
+if(!nombre||!correo){
+document.getElementById("error1").innerHTML="⚠️ Completa los datos";
+return;
+}
+pantalla1.classList.add("hidden");
+pantalla2.classList.remove("hidden");
+}
+
+/* ===== RENDER PERFIL ===== */
+function renderPerfil(perfil){
+let d=descripciones[perfil]||{};
+return `
+<div class="card">
+
+<h2 style="text-align:center">${perfil}</h2>
+<p style="text-align:center">${d.general||""}</p>
+
+<div class="flex">
+<div class="card"><b>Deseo principal</b><p>${d.deseo||""}</p></div>
+<div class="card"><b>Temor principal</b><p>${d.temor||""}</p></div>
+<div class="card"><b>Prioridad</b><p>${d.prioridad||""}</p></div>
+</div>
+
+<div class="card">
+<p><b>Deseo:</b> ${d?.detalle?.deseo||""}</p>
+<p><b>Temor:</b> ${d?.detalle?.temor||""}</p>
+<p><b>Prioridad:</b> ${d?.detalle?.prioridad||""}</p>
+</div>
+
+<div class="split">
+<div class="card"><b>Fortalezas</b><ul>${(d.fortalezas||[]).map(f=>`<li>${f}</li>`).join("")}</ul></div>
+<div class="card"><b>Debilidades</b><ul>${(d.debilidades||[]).map(f=>`<li>${f}</li>`).join("")}</ul></div>
+</div>
+
+<div class="card">
+<b>${d?.referente?.nombre||""}</b>
+<p>${d?.referente?.descripcion||""}</p>
+</div>
+
+</div>`;
+}
+
+let chart;
+
+/* ===== RESULTADO ===== */
+function calcularResultado(){
+
+let puntajes=[0,0,0,0,0];
+let incompleto=false;
+
+preguntas.forEach((_,p)=>{
+for(let f=0;f<5;f++){
+let sel=document.querySelector(`input[name="p${p}_f${f}"]:checked`);
+if(!sel){incompleto=true;}
+else{puntajes[f]+=parseInt(sel.value);}
+}
+});
+
+if(incompleto){
+document.getElementById("error2").innerHTML="⚠️ Responde todo";
+return;
+}
+
+pantalla2.classList.add("hidden");
+pantalla3.classList.remove("hidden");
+
+let max=Math.max(...puntajes);
+let indices=puntajes.map((v,i)=>v===max?i:-1).filter(i=>i!==-1);
+
+let html=`<h3>${nombre.value}</h3><p>${correo.value}</p>`;
+
+if(indices.length===1){
+html+=renderPerfil(perfiles[indices[0]]);
+}else{
+html+=`<h2 style="text-align:center">Tu perfil es: ${indices.map(i=>perfiles[i]).join(" y ")}</h2>`;
+html+=`<div class="split">`;
+indices.forEach(i=>{
+html+=`<div style="flex:1">${renderPerfil(perfiles[i])}</div>`;
+});
+html+=`</div>`;
+}
+
+document.getElementById("resultado").innerHTML=html;
+
+/* gráfica */
+if(chart){chart.destroy();}
+chart=new Chart(document.getElementById("grafica"),{
+type:"bar",
+data:{labels:perfiles,datasets:[{label:"Puntaje",data:puntajes}]}
+});
+
+}
+
+/* ===== PDF ===== */
+async function descargarPDF(){
+const { jsPDF } = window.jspdf;
+let canvas=await html2canvas(document.getElementById("zonaPDF"));
+let img=canvas.toDataURL("image/png");
+let pdf=new jsPDF();
+pdf.addImage(img,'PNG',10,10,180,0);
+pdf.save("resultado.pdf");
+}
+
+</script>
+
+</body>
+</html>
