@@ -129,7 +129,7 @@ const opciones=[
 /* ===== PREGUNTAS ===== */
 const preguntas = [
 {
-titulo:"Lo primero que haces cuando  comienzas un proyecto es:",
+titulo:"1. Lo primero que haces cuando  comienzas un proyecto es:",
 afirmaciones:[
 "Planificas cada detalle y haces listas",
 "Buscas un proyecto similar como referencia",
@@ -139,7 +139,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"De los siguientes, que crees que es lo más importante para que tu proyecto tenga éxito:",
+titulo:"2. De los siguientes, que crees que es lo más importante para que tu proyecto tenga éxito:",
 afirmaciones:[
 "Seguir el proceso",
 "Detectar la oportunidad adecuada",
@@ -149,7 +149,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"En el contexto de trabajo en equipo, mi mayor fortaleza es:",
+titulo:"3. En el contexto de trabajo en equipo, mi mayor fortaleza es:",
 afirmaciones:[
 "Planificación  y ejecución",
 "Detectar oportunidades y adaptar ideas",
@@ -159,7 +159,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Si tuviera que tomar una decisión importante con respecto al proyecto, yo:",
+titulo:"4. Si tuviera que tomar una decisión importante con respecto al proyecto, yo:",
 afirmaciones:[
 "Veo si encaja en el plan de acción",
 "Comparo los costos y beneficios de todas las acciones rápidamente",
@@ -169,7 +169,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Cual sería tu mayor preocupación mientras el proyecto está en marcha?",
+titulo:"5. Cual sería tu mayor preocupación mientras el proyecto está en marcha?",
 afirmaciones:[
 "Que las cosas se salgan de control o se vuelva un caos",
 "Que el proyecto no genere dinero",
@@ -179,7 +179,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Imagina que hay una crisis durante el proyecto . Tu reacción sería:",
+titulo:"6. Imagina que hay una crisis durante el proyecto . Tu reacción sería:",
 afirmaciones:[
 "Usar un plan b que ya tendría listo",
 "Aprovechar al máximo la situación y adaptarme rápidamente",
@@ -189,7 +189,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Imagina que te piden que evalúes tu proyecto y los proyectos de tus compañeros. Que es un proyecto exitoso según tú:",
+titulo:"7. Imagina que te piden que evalúes tu proyecto y los proyectos de tus compañeros. Que es un proyecto exitoso según tú:",
 afirmaciones:[
 "El proyecto es ejecutado efectivamente y a tiempo",
 "El proyecto genera ganancias y tiene sentido financieramente hablando",
@@ -199,7 +199,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Imagina que estás considerando iniciar un negocio. Tu comenzarías algo propio porque:",
+titulo:"8. Imagina que estás considerando iniciar un negocio. Tu comenzarías algo propio porque:",
 afirmaciones:[
 "Veo una solución más eficiente al problema",
 "Veo una oportunidad para construir un negocio rentable rápidamente",
@@ -209,7 +209,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"¿qué tanto se parecen los siguientes emprendedores a tu personalidad?",
+titulo:"9. ¿qué tanto se parecen los siguientes emprendedores a tu personalidad?",
 afirmaciones:[
 "Henry ford, el fundador de la compañía de motores ford, que creó el primer automóvil accesible para la clase media americana",
 "Richard branson, el fundador del grupo virgin, que es rápido al identificar oportunidades de negocio y necesidades no satisfechas.  El grupo virgin tiene más de 400 compañías - desde celulares hasta viaje espacial",
@@ -219,7 +219,7 @@ afirmaciones:[
 ]
 },
 {
-titulo:"Está pregunta es acerca de tu perspectiva, en general. Tú crees que:",
+titulo:"10. Está pregunta es acerca de tu perspectiva, en general. Tú crees que:",
 afirmaciones:[
 "La vida es una aventura bien planeada",
 "La vida es aprovechar al máximo cada momento",
@@ -273,12 +273,6 @@ return `
 <div class="card"><b>Deseo principal</b><p>${d.deseo||""}</p></div>
 <div class="card"><b>Temor principal</b><p>${d.temor||""}</p></div>
 <div class="card"><b>Prioridad</b><p>${d.prioridad||""}</p></div>
-</div>
-
-<div class="card">
-<p><b>Deseo:</b> ${d?.detalle?.deseo||""}</p>
-<p><b>Temor:</b> ${d?.detalle?.temor||""}</p>
-<p><b>Prioridad:</b> ${d?.detalle?.prioridad||""}</p>
 </div>
 
 <div class="split">
